@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#f9a825"/>
+  <title>Surya Namaskar Counter</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 30px; }
+    input { margin: 5px; width: 60px; padding: 5px; }
+    button { padding: 10px 20px; margin: 10px; font-size: 1em; }
+    #countDisplay { font-size: 2em; margin: 20px 0; }
+  </style>
+  <link rel="manifest" href="data:application/manifest+json,{
+    &quot;name&quot;: &quot;Surya Namaskar Counter&quot;,
+    &quot;short_name&quot;: &quot;NamaskarCounter&quot;,
+    &quot;start_url&quot;: &quot;.&quot;,
+    &quot;display&quot;: &quot;standalone&quot;,
+    &quot;background_color&quot;: &quot;#ffffff&quot;,
+    &quot;theme_color&quot;: &quot;#f9a825&quot;,
+    &quot;icons&quot;: []
+  }">
+</head>
+<body>
+  <h2>🧘 Surya Namaskar Counter</h2>
+  <label>Reps: <input type="number" id="reps" value="3"></label>
+  <label>Count to: <input type="number" id="count" value="12"></label>
+  <label>Time per Rep (sec): <input type="number" id="time" value="60"></label><br>
+  <button onclick="startCounter()">Start</button>
+  <button onclick="stopCounter()">Stop</button>
+  <div id="countDisplay">Ready</div>
+
+  <!-- 🔔 Chime Sound -->
+ <audio id="chime" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_b59026b9b7.mp3?filename=small-bell-ring-96244.mp3" preload="auto"></audio>
+
+  <script>
+    let stop = false;
+
+    function speak(text) {
+      const msg = new SpeechSynthesisUtterance(text);
+      msg.lang = "en-IN";
+      msg.rate = 0.9;
+      window.speechSynthesis.speak(msg);
+    }
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function startCounter() {
+      stop = false;
+      const reps = parseInt(document.getElementById('reps').value);
+      const count = parseInt(document.getElementById('count').value);
+      const time = parseFloat(document.getElementById('time').value);
+      const delay = (time * 1000) / count;
+      const display = document.getElementById('countDisplay');
+
+      for (let r = 1; r <= reps; r++) {
+        if (stop) break;
+        for (let c = 1; c <= count; c++) {
+          if (stop) break;
+          display.textContent = `Cycle ${r} | ${c}`;
+          speak(`${c}`);
+          await sleep(delay);
+        }
+        if (!stop) {
+          document.getElementById("chime").play(); // 🎵 play chime at end of cycle
+          await sleep(1000);
+        }
+      }
+
+      display.textContent = stop ? 'Stopped' : '✔ Complete';
+    }
+
+    function stopCounter() {
+      stop = true;
+      window.speechSynthesis.cancel();
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>
