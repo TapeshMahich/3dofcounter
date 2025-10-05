@@ -1,2 +1,2 @@
 # FreedomCounter
-useful for fitness people. A counter that you can customize.
+A counter that you can customize according to your requirements. 
